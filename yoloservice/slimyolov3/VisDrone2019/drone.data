@@ -1,0 +1,7 @@
+classes=10
+train = slimyolov3/VisDrone2019/drone/train.lists
+valid = slimyolov3/VisDrone2019/drone/val.lists
+labels = slimyolov3/VisDrone2019/drone/labels.txt
+names = slimyolov3/VisDrone2019/drone/labels.txt
+backup = slimyolov3/backup_drone
+eval=coco
