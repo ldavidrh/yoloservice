@@ -4,10 +4,9 @@ from concurrent import futures
 from yoloservice.slimyolov3.slimyolo import SlimYoloObjectDetection
 from yoloservice.generated import detectionservice_pb2_grpc, detectionservice_pb2
 
-im = Image.open("cat.jpg")
+im = Image.open("cars.jpg")
 buf = io.BytesIO()
 im.save(buf, format="JPEG")
-print(buf.getvalue())
 def spam_images():
     for i in range(100):
         time.sleep(0.2)
@@ -16,8 +15,10 @@ def spam_images():
 channel = grpc.insecure_channel("localhost:5555")
 stub = detectionservice_pb2_grpc.ProcessFramesStub(channel)
 responses = stub.Process(spam_images())
-
 for response in responses:
-    print(response)
+    img = response.response_img
+    image = Image.open(io.BytesIO(img))
+    image.show()
+    break
 
 
