@@ -7,11 +7,11 @@ from yoloservice.generated import detectionservice_pb2_grpc, detectionservice_pb
 im = Image.open("cat.jpg")
 buf = io.BytesIO()
 im.save(buf, format="JPEG")
-
+print(buf.getvalue())
 def spam_images():
     for i in range(100):
         time.sleep(0.2)
-        yield detectionservice_pb2.Frame(request_img=buf.getvalue(), width=im.width, height=im.height ,frame_id=1)
+        yield detectionservice_pb2.Frame(request_img=buf.getvalue(), width=im.width, height=im.height ,frame_id=int(i))
 
 channel = grpc.insecure_channel("localhost:5555")
 stub = detectionservice_pb2_grpc.ProcessFramesStub(channel)
