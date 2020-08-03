@@ -7,18 +7,20 @@ from yoloservice.generated import detectionservice_pb2_grpc, detectionservice_pb
 
 
 yolo = SlimYoloObjectDetection()
-queues = {}
 
 class ReceiveFrame(detectionservice_pb2_grpc.ProcessFramesServicer):
     def Process(self, requests, context):
+        client_uuid = str(uuid.uuid4())
+        print("UUID for client created: %s" % client_uuid)
+        yolo.create_client_queues(client_uuid)
         frames = requests
         for frame in frames:
+            print("received frame from cliente with uuid: %s"%client_uuid)
             img = Image.open(io.BytesIO(frame.request_img))
             imgarray = np.asarray(img) 
-            yolo.non_processed_frames.append((imgarray, int(frame.frame_id)))
-            if yolo.processed_frames_for_risks.head != None:
-                count = count + 1 
-                processed_frame = yolo.processed_frames_for_risks.pop()
+            yolo.input_queues[client_uuid].append((imgarray, int(frame.frame_id)))
+            if yolo.output_queues_risks[client_uuid].head != None:
+                processed_frame = yolo.output_queues_risks[client_uuid].pop()
                 detections = processed_frame["detected_objects"]
                 detections = json.dumps(detections)
                 index = processed_frame["index"]
@@ -37,4 +39,5 @@ def serve():
     server.start()
     print("Server running on port %s"% port)
     server.wait_for_termination()
+    
 
