@@ -15,11 +15,11 @@ def spam_images():
 channel = grpc.insecure_channel("localhost:5555")
 stub = detectionservice_pb2_grpc.ProcessFramesStub(channel)
 responses = stub.Process(spam_images())
-image = None
+
 for response in responses:
     img = response.response_img
     image = Image.open(io.BytesIO(img))
-    image.show()
+    image.save("client2.jpg")
     break
 
 
