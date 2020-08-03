@@ -865,6 +865,8 @@ class Node(object):
     self.next = None
     self.previous = None
 
+class EmptyQueueException(Exception):
+    pass
 
 class Queue(object):
   def __init__(self, maxlen):
@@ -892,7 +894,7 @@ class Queue(object):
 
   def pop(self):
       if self.head == None:
-          raise Exception("empty queue")
+          raise EmptyQueueException("empty queue")
       if self.head.next == None:
           item = self.head.item
           self.head = None

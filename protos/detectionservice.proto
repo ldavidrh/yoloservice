@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 service ProcessFrames {
-  rpc Process (stream Frame) returns (stream Detection);
+  rpc Push (stream Frame) returns (stream Detection);
 }
 
 //Image format JPEG
@@ -10,11 +10,13 @@ message Frame {
   int32 width = 2;
   int32 height = 3;
   int32 frame_id = 4;
+  int32 client_id = 5;
 }
 
 message Detection {
   bytes response_img = 1;
   string detections = 2;
   int32 frame_id = 3;
+  int32 client_id = 4;
 }
 

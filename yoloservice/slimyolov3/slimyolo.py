@@ -18,18 +18,18 @@ class SlimYoloObjectDetection(object):
         self.processed_frames = Queue(maxlen=10)
         self.non_processed_frames = Queue(maxlen=10)
         self.processed_frames_for_risks = Queue(maxlen=10)
-        APPS_DIR = environ.Path(__file__) - 2
+        APPS_DIR = environ.Path("/home/aras/Documentos/psbposas/yoloservice/yoloservice")
         self.dirname = APPS_DIR
-        self.cfg = 'slimyolov3/cfg/prune_0.5_0.5_0.7.cfg'  # cfg file path
-        self.data = 'slimyolov3/VisDrone2019/drone.data'
-        self.weights = 'slimyolov3/weights/prune_0.5_0.5_0.7_final.weights'  # path to weights file
+        self.cfg = os.path.join(APPS_DIR, 'slimyolov3/cfg/prune_0.5_0.5_0.7.cfg')  # cfg file path
+        self.data = os.path.join(APPS_DIR, 'slimyolov3/VisDrone2019/drone.data')
+        self.weights = os.path.join(APPS_DIR, 'slimyolov3/weights/prune_0.5_0.5_0.7_final.weights')  # path to weights file
         self.img_size = 608  # inference size (pixels)
         self.conf_thres = 0.3  # object confidence threshold
         self.nms_thres = 0.5  # iou threshold for non-maximum suppression
         self.half = True
         self.put_box = True
         self.is_streaming = True
-
+        print(APPS_DIR)
         # start consumer
         thread = threading.Thread(target=self.start_detection, args=())
         #thread.daemon = True
@@ -62,11 +62,11 @@ class SlimYoloObjectDetection(object):
             model = Darknet(self.cfg, img_size)
 
             # Load weights
-            if str(weights).endswith('.pt'):  # pytorch format
+            if str(self.weights).endswith('.pt'):  # pytorch format
                 model.load_state_dict(torch.load(
                     weights, map_location=device)['model'])
             else:  # darknet format
-                _ = load_darknet_weights(model, weights)
+                _ = load_darknet_weights(model, self.weights)
 
             # Fuse Conv2d + BatchNorm2d layers
             # model.fuse()
@@ -101,8 +101,9 @@ class SlimYoloObjectDetection(object):
                     break
                 try:
                     im0, index = self.non_processed_frames.pop()
-                except Exception:
-                    if self.is_streaming == False:
+                    print(im0.shape)
+                except EmptyQueueException as eqe:
+                     if self.is_streaming == False:
                         break
                 else:
                     if type(im0) == type(None):
@@ -142,8 +143,8 @@ class SlimYoloObjectDetection(object):
 
                             if self.put_box:  # Add bbox to image
                                 label = '%s %.2f' % (classes[int(cls)], conf)
-                                obj = {'label': classes[int(
-                                    cls)], 'conf': conf, 'box': xyxy}
+                                obj = {'label': str(classes[int(
+                                    cls)]), 'conf': float(conf), 'box': [int(val) for val in xyxy]}
                                 detected_objects.append(obj)
                                 plot_one_box(xyxy, im0, label=label,
                                              color=colors[int(cls)])
