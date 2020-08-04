@@ -9,7 +9,7 @@ setuptools.setup(
     author="Luis Restrepo",
     author_email="luisrestrepo1995@gmail.com",
     description="Package for YOLO service",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/PSBPOSAS/yoloservice/",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
